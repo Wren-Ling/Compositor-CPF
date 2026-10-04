@@ -1,6 +1,6 @@
 import AppKit
 
-enum ShapeKind: String, CaseIterable, Codable, Sendable {
+enum ShapeKind: String, CaseIterable, Codable, Sendable, LocalizedDisplayName {
     case rectangle = "Rectangle"
     case ellipse = "Ellipse"
     case line = "Line"
@@ -128,7 +128,7 @@ extension EditorSession {
         }
         guard canEditLayers, document != nil, rect.width >= 1, rect.height >= 1 else { return }
         guard Int(rect.width) * Int(rect.height) <= Self.maxShapePixels else {
-            brushError = "That shape is too large. A shape can cover up to \(DocumentLimits.maxSurfaceMegapixels) megapixels."
+            brushError = String(localized: "That shape is too large. A shape can cover up to \(DocumentLimits.maxSurfaceMegapixels) megapixels.")
             return
         }
         do {

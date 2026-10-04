@@ -27,7 +27,7 @@ enum PSDDocumentBuilder {
         for record in document.layers {
             if record.croppedToCanvas {
                 conversions.append(PSDConversion(layerName: record.name,
-                                                 message: "Cropped to the canvas so the file fits in memory. Pixels outside the canvas weren't imported."))
+                                                 message: String(localized: "Cropped to the canvas so the file fits in memory. Pixels outside the canvas weren't imported.")))
             }
             let renderedText = record.text.flatMap { try? PSDText.render($0) }
             var notes: [String] = []
@@ -40,33 +40,33 @@ enum PSDDocumentBuilder {
                 }
             }
             if record.kind == .smartObject {
-                notes.append("The smart object was rasterized. Linked contents can’t be edited.")
+                notes.append(String(localized: "The smart object was rasterized. Linked contents can’t be edited."))
             }
             if record.kind == .effects {
-                notes.append("Layer effects were discarded, so the appearance may differ.")
+                notes.append(String(localized: "Layer effects were discarded, so the appearance may differ."))
             }
             if record.kind == .vector {
                 if record.shape != nil {
                     notes.append(contentsOf: record.shapeNotes)
                 } else {
-                    notes.append("Vector shape was rasterized to pixels.")
+                    notes.append(String(localized: "Vector shape was rasterized to pixels."))
                 }
             }
             if record.kind == .other {
-                notes.append("This Photoshop layer type isn’t supported and was imported as pixels.")
+                notes.append(String(localized: "This Photoshop layer type isn’t supported and was imported as pixels."))
             }
             if record.isGroup {
                 if record.blendKey != "pass" && record.blendKey != "norm" {
-                    notes.append("Folder blend mode “\(record.blendKey)” isn’t supported. The folder will be pass-through.")
+                    notes.append(String(localized: "Folder blend mode “\(record.blendKey)” isn’t supported. The folder will be pass-through."))
                 }
             } else if record.blendMode == nil, record.blendKey != "pass" {
-                notes.append("Blend mode “\(record.blendKey.trimmingCharacters(in: .whitespaces))” isn’t supported and will be applied as Normal.")
+                notes.append(String(localized: "Blend mode “\(record.blendKey.trimmingCharacters(in: .whitespaces))” isn’t supported and will be applied as Normal."))
             }
             if record.kind == .adjustment {
                 if record.adjustment == nil {
-                    notes.append("This adjustment type isn’t supported and was skipped.")
+                    notes.append(String(localized: "This adjustment type isn’t supported and was skipped."))
                 } else {
-                    notes.append("Adjustment parameters may not match Photoshop exactly.")
+                    notes.append(String(localized: "Adjustment parameters may not match Photoshop exactly."))
                 }
             }
             for note in notes {

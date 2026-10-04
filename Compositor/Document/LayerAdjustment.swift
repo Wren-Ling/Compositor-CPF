@@ -1,7 +1,7 @@
 import AppKit
 import CoreImage
 
-enum AdjustmentKind: String, Codable, CaseIterable, Sendable {
+enum AdjustmentKind: String, Codable, CaseIterable, Sendable, LocalizedDisplayName {
     case hsv = "Hue/Saturation", levels = "Levels", curves = "Curves"
     case exposure = "Exposure", gradientMap = "Gradient Map", grain = "Grain", addNoise = "Add Noise"
     case gaussianBlur = "Gaussian Blur", motionBlur = "Motion Blur"

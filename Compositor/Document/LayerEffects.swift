@@ -209,7 +209,7 @@ struct LayerEffects: Codable, Equatable, Sendable {
     }
 }
 
-enum LayerEffectKind: String, CaseIterable, Sendable {
+enum LayerEffectKind: String, CaseIterable, Sendable, LocalizedDisplayName {
     case stroke = "Stroke", shadow = "Drop Shadow", colorOverlay = "Color Overlay", innerShadow = "Inner Shadow", outerGlow = "Outer Glow", innerGlow = "Inner Glow"
 }
 

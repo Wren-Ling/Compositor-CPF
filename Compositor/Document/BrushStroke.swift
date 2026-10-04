@@ -1,6 +1,6 @@
 import AppKit
 
-enum SpotHealingMode: String, CaseIterable, Sendable, Hashable {
+enum SpotHealingMode: String, CaseIterable, Sendable, Hashable, LocalizedDisplayName {
     case contentAware = "Content-Aware"
     case createTexture = "Create Texture"
     case proximityMatch = "Proximity Match"
