@@ -1,10 +1,10 @@
 import AppKit
 
-nonisolated enum TextAlignment: String, Codable, CaseIterable, Sendable {
+enum TextAlignment: String, Codable, CaseIterable, Sendable {
     case left = "Left", center = "Center", right = "Right"
 }
 
-nonisolated struct LayerTextStyle: Codable, Equatable, Sendable {
+struct LayerTextStyle: Codable, Equatable, Sendable {
     var content = "Text"
     var fontName = "Helvetica"
     var fontSize: CGFloat = 72
@@ -187,7 +187,7 @@ nonisolated struct LayerTextStyle: Codable, Equatable, Sendable {
     }
 }
 
-nonisolated struct LayerTextColorRun: Codable, Equatable, Sendable {
+struct LayerTextColorRun: Codable, Equatable, Sendable {
     var location: Int
     var length: Int
     var red: CGFloat
@@ -195,7 +195,7 @@ nonisolated struct LayerTextColorRun: Codable, Equatable, Sendable {
     var blue: CGFloat
 }
 
-nonisolated struct LayerTextFontRun: Codable, Equatable, Sendable {
+struct LayerTextFontRun: Codable, Equatable, Sendable {
     var location: Int
     var length: Int
     var fontName: String
@@ -203,7 +203,7 @@ nonisolated struct LayerTextFontRun: Codable, Equatable, Sendable {
 
 /// The cached raster participates in the existing compositor. Pixel edits rasterize the layer;
 /// transforms and masks keep the source text editable, just as shape layers keep their source.
-nonisolated struct LayerText: Equatable, @unchecked Sendable {
+struct LayerText: Equatable, @unchecked Sendable {
     var style: LayerTextStyle
     let image: CGImage
     static func == (lhs: Self, rhs: Self) -> Bool { lhs.style == rhs.style && lhs.image === rhs.image }

@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-nonisolated struct PSDImport: @unchecked Sendable {
+struct PSDImport: @unchecked Sendable {
     let width: Int
     let height: Int
     let resolution: Double
@@ -9,7 +9,7 @@ nonisolated struct PSDImport: @unchecked Sendable {
     let conversions: [PSDConversion]
 }
 
-nonisolated enum PSDDocumentBuilder {
+enum PSDDocumentBuilder {
     static func assets(from document: PSDDocument) throws -> [UUID: ImportedImage] {
         var result: [UUID: ImportedImage] = [:]
         for record in document.layers {

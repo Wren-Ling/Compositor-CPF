@@ -8,7 +8,7 @@ import Foundation
 /// The engine dictionary inside `EngineData` supplies the font, size, color,
 /// tracking, leading and alignment. Anything this model cannot represent
 /// (vertical text, shear, uneven scale) stays a raster.
-nonisolated enum PSDText {
+enum PSDText {
     struct Source: Sendable {
         var style: LayerTextStyle
         var notes: [String]
@@ -268,7 +268,7 @@ nonisolated enum PSDText {
     }
 }
 
-private nonisolated enum Engine {
+private  enum Engine {
     case number(Double)
     case bool(Bool)
     case string(String)
@@ -319,7 +319,7 @@ private nonisolated func dictionary(in data: Data, at start: Int) -> Engine? {
     return .dict(items)
 }
 
-private nonisolated struct EngineCursor {
+private  struct EngineCursor {
     let bytes: [UInt8]
     var index = 0
 
@@ -501,7 +501,7 @@ private nonisolated struct EngineCursor {
     }
 }
 
-private nonisolated enum DescriptorValue {
+private  enum DescriptorValue {
     case text(String)
     case number(Double)
     case enumeration(String)
@@ -510,7 +510,7 @@ private nonisolated enum DescriptorValue {
     case list([DescriptorValue])
 }
 
-private nonisolated extension Dictionary where Key == String, Value == DescriptorValue {
+private  extension Dictionary where Key == String, Value == DescriptorValue {
     func string(_ key: String) -> String? {
         if case .text(let text) = self[key] { return text }
         return nil
@@ -536,7 +536,7 @@ private nonisolated extension Dictionary where Key == String, Value == Descripto
 }
 
 /// Descriptor walker from the same specification (class and keys are length-prefixed, or 4 bytes when the length is 0).
-private nonisolated struct Reader {
+private  struct Reader {
     let data: Data
     var offset = 0
     var remaining: Int { data.count - offset }

@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 
 /// A user-placed alignment line. Horizontal guides sit at a document Y; vertical at a document X.
-nonisolated struct CanvasGuide: Codable, Equatable, Sendable, Hashable {
+struct CanvasGuide: Codable, Equatable, Sendable, Hashable {
     enum Axis: String, Codable, Sendable { case horizontal, vertical }
     var id: UUID
     var axis: Axis

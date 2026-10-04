@@ -2,12 +2,12 @@ import AppKit
 
 /// The Blur tool's modes. Smudge and Liquify push the active layer's pixels around under the brush.
 /// The Brush tool's modes.
-nonisolated enum BrushToolMode: String, CaseIterable, Sendable {
+enum BrushToolMode: String, CaseIterable, Sendable {
     case paint = "Paint"
     case erase = "Erase"
 }
 
-nonisolated enum BlurToolMode: String, CaseIterable, Sendable {
+enum BlurToolMode: String, CaseIterable, Sendable {
     case liquify = "Liquify"
     case blur = "Blur"
     case smudge = "Smudge"
@@ -16,6 +16,7 @@ nonisolated enum BlurToolMode: String, CaseIterable, Sendable {
 /// A Smudge or Liquify stroke in progress. It works on the active layer as the canvas shows it, at document size,
 /// changing it dab by dab; the canvas shows that working copy in place of the layer. When the stroke ends, the result
 /// is painted into the layer's own pixels along the stroke's path (see `EditorSession.finishWarp`).
+@MainActor
 final class WarpStroke {
     let layer: ImageLayer
     let mode: BlurToolMode

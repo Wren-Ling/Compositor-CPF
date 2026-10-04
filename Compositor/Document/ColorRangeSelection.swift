@@ -28,13 +28,13 @@ final class ColorRangeEdit {
     var hasColors: Bool { !include.isEmpty }
 }
 
-private nonisolated struct ColorRangeJob: @unchecked Sendable {
+private  struct ColorRangeJob: @unchecked Sendable {
     let image: CGImage
     let include: [UInt8], exclude: [UInt8]
     let fuzziness: Int32, invert: Bool
 }
 
-private nonisolated struct ColorRangeResult: @unchecked Sendable {
+private  struct ColorRangeResult: @unchecked Sendable {
     var path: CGPath?
     var preview: CGImage?
     var error: Error?

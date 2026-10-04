@@ -191,7 +191,8 @@ struct ImageAdjustmentTests {
         #expect(try #require(session.filterEdit).preview)
         await session.commitFilter()
         let gray = try pixels(try #require(session.activeLayer?.asset?.image))
-        #expect(gray == (try pixels(BlackWhiteSettings().apply(base))))
+        let expectedGray = try pixels(BlackWhiteSettings().apply(base))
+        #expect(gray == expectedGray)
         session.undo()
 
         session.beginFilter(.colorBalance)

@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 import UniformTypeIdentifiers
 
-nonisolated enum PSDError: LocalizedError, Equatable {
+enum PSDError: LocalizedError, Equatable {
     case truncated, unsupportedVersion, unsupportedColorMode, unsupportedDepth, unsupportedCompression
     var errorDescription: String? {
         switch self {
@@ -15,7 +15,7 @@ nonisolated enum PSDError: LocalizedError, Equatable {
     }
 }
 
-nonisolated struct PSDConversion: Identifiable, Equatable, Sendable {
+struct PSDConversion: Identifiable, Equatable, Sendable {
     let id: UUID
     let layerName: String
     let message: String
@@ -26,7 +26,7 @@ nonisolated struct PSDConversion: Identifiable, Equatable, Sendable {
     }
 }
 
-nonisolated struct PSDDocument: @unchecked Sendable {
+struct PSDDocument: @unchecked Sendable {
     var width: Int
     var height: Int
     var resolution: Double
@@ -34,7 +34,7 @@ nonisolated struct PSDDocument: @unchecked Sendable {
     var layers: [PSDRecord]
 }
 
-nonisolated struct PSDRecord: @unchecked Sendable {
+struct PSDRecord: @unchecked Sendable {
     var id: UUID
     var parentID: UUID?
     var name: String
@@ -61,7 +61,7 @@ nonisolated struct PSDRecord: @unchecked Sendable {
     var text: PSDText.Source?
 }
 
-nonisolated enum PSDLayerKind: Equatable, Sendable {
+enum PSDLayerKind: Equatable, Sendable {
     case raster, group, adjustment, text, smartObject, effects, vector, other
 }
 

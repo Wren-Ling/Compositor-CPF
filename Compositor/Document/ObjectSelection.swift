@@ -2,7 +2,7 @@ import AppKit
 import CoreImage
 import Vision
 
-nonisolated struct ObjectSelectionSettings: Equatable, Sendable {
+struct ObjectSelectionSettings: Equatable, Sendable {
     /// Read the visible composite rather than just the active layer.
     var sampleAllLayers = true
     /// Positive values erode the detected mask inward; negative values expand it outward.
@@ -11,7 +11,7 @@ nonisolated struct ObjectSelectionSettings: Equatable, Sendable {
 
 /// Selects the foreground object under a clicked point using Vision's instance mask,
 /// then traces that mask into the document's normal path-based selection.
-nonisolated enum ObjectSelection {
+enum ObjectSelection {
     enum Failure: LocalizedError {
         case unsupported
         case render
@@ -255,14 +255,14 @@ nonisolated enum ObjectSelection {
     }
 }
 
-private nonisolated struct ObjectSelectionJob: @unchecked Sendable {
+private  struct ObjectSelectionJob: @unchecked Sendable {
     let image: CGImage
     let point: CGPoint
     let edgeOffset: Int
     let smoothEdges: Bool
 }
 
-private nonisolated struct ObjectSelectionResult: @unchecked Sendable {
+private  struct ObjectSelectionResult: @unchecked Sendable {
     let path: CGPath?
     let error: Error?
 }

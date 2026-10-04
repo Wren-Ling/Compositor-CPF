@@ -168,6 +168,7 @@ import QuartzCore
     /// place by the GPU, in order with everything else it does to that texture. Written straight into the texture's
     /// memory instead, a tile isn't seen on every GPU — a virtual machine's keeps its own copy, and parts of the texture
     /// came out empty.
+    @MainActor
     private final class TileWrites {
         let renderer: GPUCanvasRenderer
         let texture: MTLTexture
@@ -458,7 +459,7 @@ final class MetalCanvasView: NSView {
     }
 }
 
-nonisolated enum GPUBlend {
+enum GPUBlend {
     /// `top` composited over `bottom` in `mode`.
     static func blend(_ top: CIImage, over bottom: CIImage, mode: LayerBlendMode) -> CIImage {
         guard let name = filterName(mode) else { return top.composited(over: bottom) }
@@ -500,7 +501,7 @@ nonisolated enum GPUBlend {
     }
 }
 
-nonisolated enum GPUAdjustment {
+enum GPUAdjustment {
     /// `image` adjusted, laid out in frame pixels: `scale` frame pixels per document pixel, and `mapping` from document
     /// pixels to the frame (for Grain, whose pattern belongs to the document).
     static func apply(_ adjustment: LayerAdjustment, to image: CIImage, scale: CGFloat, mapping: CGAffineTransform) -> CIImage? {

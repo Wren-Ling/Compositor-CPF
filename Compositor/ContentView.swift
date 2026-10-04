@@ -164,7 +164,7 @@ struct ContentView: View {
                     .disabled(session.isImporting || session.showsBusy || session.levels != nil)
                     .modifier(NewProjectDropTarget(workspace: applicationDelegate?.workspace))
             }
-            ToolbarSpacer(.fixed, placement: .navigation)
+            ToolbarGap(width: .fixed, placement: .navigation)
             if let workspace = applicationDelegate?.workspace {
                 ToolbarItem(placement: .navigation) {
                     ProjectTabStrip(workspace: workspace)
@@ -173,11 +173,14 @@ struct ContentView: View {
                         // strip scrolls instead.
                         .frame(width: max(200, windowWidth - 352), height: 34, alignment: .center)
                 }
-                .sharedBackgroundVisibility(.hidden)
+                // macOS 26-only, like the spacers above.
+                #if compiler(>=6.2)
+                .modifier(HiddenToolbarBackground())
+                #endif
             }
             // Absorb all remaining navigation-toolbar width before the zoom controls.
             // Without this spacer, the growing tab strip pushes the primary actions left.
-            ToolbarSpacer(.flexible, placement: .navigation)
+            ToolbarGap(width: .flexible, placement: .navigation)
             ToolbarItem(placement: .primaryAction) {
                 Button("Fit") { session.fit() }.help("Fit canvas in window (⌘0)")
                     .accessibilityIdentifier("fitCanvas").disabled(session.document == nil)
@@ -468,3 +471,38 @@ private struct WidthReader: ViewModifier {
         content.onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
     }
 }
+
+/// A gap between toolbar items. `ToolbarSpacer` is macOS 26-only, so an older system gets a plain spacer:
+/// fixed for a set gap, flexible to absorb whatever width is left.
+struct ToolbarGap: ToolbarContent {
+    enum Width { case fixed, flexible }
+    let width: Width
+    let placement: ToolbarItemPlacement
+
+    @ToolbarContentBuilder var body: some ToolbarContent {
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            ToolbarSpacer(width == .fixed ? .fixed : .flexible, placement: placement)
+        } else {
+            fallback
+        }
+        #else
+        fallback
+        #endif
+    }
+
+    private var fallback: some ToolbarContent {
+        ToolbarItem(placement: placement) {
+            Spacer().frame(minWidth: width == .fixed ? 8 : 0)
+        }
+    }
+}
+
+#if compiler(>=6.2)
+/// Hides the toolbar item's shared background on macOS 26, where the tab strip draws its own.
+struct HiddenToolbarBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) { content.sharedBackgroundVisibility(.hidden) } else { content }
+    }
+}
+#endif
