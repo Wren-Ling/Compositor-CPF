@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-enum LayerBlendMode: String, Codable, CaseIterable, Sendable {
+enum LayerBlendMode: String, Codable, CaseIterable, Sendable, LocalizedDisplayName {
     case normal = "Normal"
     case darken = "Darken", multiply = "Multiply", colorBurn = "Color Burn"
     case linearBurn = "Linear Burn"

@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-enum CanvasUnit: String, CaseIterable, Sendable {
+enum CanvasUnit: String, CaseIterable, Sendable, LocalizedDisplayName {
     case pixels = "Pixels", percent = "Percent", inches = "Inches", centimeters = "Centimeters"
 }
 

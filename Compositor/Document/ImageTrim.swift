@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-public enum TrimBasedOn: String, CaseIterable, Identifiable, Sendable {
+public enum TrimBasedOn: String, CaseIterable, Identifiable, Sendable, LocalizedDisplayName {
     case transparentPixels = "Transparent Pixels"
     case topLeftPixelColor = "Top Left Pixel Color"
     case bottomRightPixelColor = "Bottom Right Pixel Color"
@@ -45,9 +45,9 @@ public enum TrimError: LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .noContentToTrim:
-            return "No content remained after trimming."
+            return String(localized: "No content remained after trimming.")
         case .invalidDimensions:
-            return "The trimmed image dimensions are invalid."
+            return String(localized: "The trimmed image dimensions are invalid.")
         }
     }
 }

@@ -1,12 +1,12 @@
 import AppKit
 
-enum GradientStyle: String, CaseIterable, Sendable {
+enum GradientStyle: String, CaseIterable, Sendable, LocalizedDisplayName {
     case foregroundToBackground = "Foreground to Background"
     case foregroundToTransparent = "Foreground to Transparent"
 }
 
 /// Linear runs from start to end; radial is centered on the start with the end on its rim.
-enum GradientShape: String, CaseIterable, Sendable {
+enum GradientShape: String, CaseIterable, Sendable, LocalizedDisplayName {
     case linear = "Linear"
     case radial = "Radial"
 }

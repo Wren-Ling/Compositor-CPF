@@ -67,12 +67,12 @@ struct SelectionClip: @unchecked Sendable {
 
 /// The Magic tool's modes: Wand selects pixels of a similar color, Object traces the outline of
 /// whatever the click lands on. Tab switches between them, as with the Brush's Paint and Erase.
-enum WandMode: String, CaseIterable, Sendable {
+enum WandMode: String, CaseIterable, Sendable, LocalizedDisplayName {
     case wand = "Wand"
     case object = "Object"
 }
 
-enum LassoKind: String, CaseIterable, Sendable {
+enum LassoKind: String, CaseIterable, Sendable, LocalizedDisplayName {
     case freehand = "Freehand"
     case polygonal = "Polygonal"
     /// The Marquee's outlines; not offered in the Lasso's Freehand/Polygonal choice.
@@ -82,7 +82,7 @@ enum LassoKind: String, CaseIterable, Sendable {
     static let marqueeChoices: [LassoKind] = [.rectangle, .ellipse]
 }
 
-enum SelectionMode: String, CaseIterable, Sendable {
+enum SelectionMode: String, CaseIterable, Sendable, LocalizedDisplayName {
     case replace = "New"
     case add = "Add"
     case subtract = "Subtract"
