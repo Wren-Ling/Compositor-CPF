@@ -1,12 +1,12 @@
 import AppKit
 
-nonisolated enum SpotHealingMode: String, CaseIterable, Sendable, Hashable {
+enum SpotHealingMode: String, CaseIterable, Sendable, Hashable {
     case contentAware = "Content-Aware"
     case createTexture = "Create Texture"
     case proximityMatch = "Proximity Match"
 }
 
-nonisolated struct BrushSettings: Sendable {
+struct BrushSettings: Sendable {
     var diameter: CGFloat = 40
     var hardness: CGFloat = 1
     var red: CGFloat = 0
@@ -26,13 +26,13 @@ nonisolated struct BrushSettings: Sendable {
     var healingMode: SpotHealingMode = .contentAware
 }
 
-nonisolated struct BrushPatch: @unchecked Sendable {
+struct BrushPatch: @unchecked Sendable {
     let rect: CGRect
     let image: CGImage
 }
 
 /// Shared top-left raster drawing, including coverage without color conversion.
-nonisolated enum BrushRaster {
+enum BrushRaster {
     static func context(width: Int, height: Int, mask: Bool) throws -> CGContext {
         guard let result = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
             bytesPerRow: width * (mask ? 1 : 4),
@@ -953,7 +953,7 @@ final class BrushStroke {
 
 actor BrushCommit {
     static let shared = BrushCommit()
-    nonisolated struct Input: @unchecked Sendable {
+     struct Input: @unchecked Sendable {
         let width: Int, height: Int
         let source: CGImage?
         let patches: [BrushPatch]
@@ -963,7 +963,7 @@ actor BrushCommit {
         /// A mask's background: what a grown mask is where neither its old pixels nor the edit reach.
         var fill: CGFloat = 1
     }
-    nonisolated struct Output: @unchecked Sendable {
+     struct Output: @unchecked Sendable {
         let asset: ImportedImage
         let pixelBounds: CGRect
     }

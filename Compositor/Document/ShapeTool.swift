@@ -1,6 +1,6 @@
 import AppKit
 
-nonisolated enum ShapeKind: String, CaseIterable, Codable, Sendable {
+enum ShapeKind: String, CaseIterable, Codable, Sendable {
     case rectangle = "Rectangle"
     case ellipse = "Ellipse"
     case line = "Line"
@@ -16,7 +16,7 @@ nonisolated enum ShapeKind: String, CaseIterable, Codable, Sendable {
 }
 
 /// What a shape layer draws, kept so the shape can be drawn again at a new size.
-nonisolated struct LayerShapeStyle: Codable, Equatable, Sendable {
+struct LayerShapeStyle: Codable, Equatable, Sendable {
     var kind: ShapeKind
     var red: CGFloat
     var green: CGFloat
@@ -34,7 +34,7 @@ nonisolated struct LayerShapeStyle: Codable, Equatable, Sendable {
 /// A layer made with the Shape tool. Its pixels are an ordinary raster, so it clips, masks, blends and filters like
 /// any layer; `image` is the raster the shape drew. Once anything else changes those pixels (painting, a filter),
 /// the layer's image is no longer this one and the layer is plain pixels from then on.
-nonisolated struct LayerShape: Equatable, @unchecked Sendable {
+struct LayerShape: Equatable, @unchecked Sendable {
     var style: LayerShapeStyle
     let image: CGImage
     static func == (lhs: Self, rhs: Self) -> Bool { lhs.style == rhs.style && lhs.image === rhs.image }

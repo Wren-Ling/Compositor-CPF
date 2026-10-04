@@ -10,7 +10,7 @@ extension UTType {
     static let importableImages: [UTType] = [.jpeg, .png, .heic, .tiff, .photoshopImage, .photoshopLargeImage, .rawImage, .svg]
 }
 
-nonisolated struct ProjectManifest: Codable, Sendable {
+struct ProjectManifest: Codable, Sendable {
     /// The format version new saves write.
     static let current = 11
     /// Every version `load` accepts. The package-header check, the manifest check and the error
@@ -30,7 +30,7 @@ nonisolated struct ProjectManifest: Codable, Sendable {
     var guides: [CanvasGuide]? = nil
 }
 
-nonisolated struct ProjectLayerRecord: Codable, Sendable {
+struct ProjectLayerRecord: Codable, Sendable {
     let id: UUID
     let name: String
     var isVisible: Bool
@@ -55,13 +55,13 @@ nonisolated struct ProjectLayerRecord: Codable, Sendable {
     var text: LayerTextStyle? = nil
 }
 
-nonisolated struct ProjectSnapshot: @unchecked Sendable {
+struct ProjectSnapshot: @unchecked Sendable {
     let manifest: ProjectManifest
     let images: [UUID: ImportedImage]
     var masks: [UUID: ImportedImage] = [:]
 }
 
-nonisolated enum ProjectError: LocalizedError {
+enum ProjectError: LocalizedError {
     case invalid, version(Int), missingImage, tooLarge, encode
     var errorDescription: String? {
         switch self {

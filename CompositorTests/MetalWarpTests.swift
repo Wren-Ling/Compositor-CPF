@@ -34,6 +34,7 @@ import Testing
         func run(gpu: Bool) throws -> CGImage {
             let stroke = try WarpStroke(layer: layer, image: image, transform: layer.transform, canvas: CGSize(width: 340, height: 240),
                                         mode: mode, settings: settings, useGPU: gpu)
+            // The GPU is used exactly when it was asked for, and this Mac has one.
             #expect((stroke.gpu != nil) == gpu)
             for step in 0...40 { stroke.append(CGPoint(x: 30 + Double(step) * 6, y: 60 + 40 * sin(Double(step) / 6))) }
             return try #require(stroke.image)

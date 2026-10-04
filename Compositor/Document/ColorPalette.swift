@@ -1,7 +1,7 @@
 import AppKit
 import Observation
 
-nonisolated struct PaletteColor: Equatable, Sendable {
+struct PaletteColor: Equatable, Sendable {
     var red: CGFloat
     var green: CGFloat
     var blue: CGFloat

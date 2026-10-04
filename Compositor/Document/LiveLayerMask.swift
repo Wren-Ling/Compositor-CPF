@@ -1,6 +1,6 @@
 import AppKit
 
-nonisolated enum LiveMaskGraph {
+enum LiveMaskGraph {
     static func validate(_ layers: [ProjectLayerRecord]) throws {
         var records: [UUID: ProjectLayerRecord] = [:]
         for layer in layers {
@@ -71,7 +71,7 @@ extension EditorSession {
     }
 }
 
-nonisolated enum LiveMaskBaker {
+enum LiveMaskBaker {
     static func bake(_ snapshot: ProjectSnapshot, target: UUID) throws -> ImportedImage? {
         guard let record = snapshot.manifest.layers.first(where: { $0.id == target }), let original = snapshot.images[target] else { return nil }
         let w = original.image.width, h = original.image.height

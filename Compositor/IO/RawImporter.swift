@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 /// photosite at 12–14 bits; every choice a JPEG has already baked in — exposure, white balance,
 /// contrast — is still open. Compositor's layers are 8-bit, so that latitude has to be spent at
 /// import: these are the controls for spending it deliberately rather than accepting a default.
-nonisolated struct RawDevelopSettings: Equatable, Sendable {
+struct RawDevelopSettings: Equatable, Sendable {
     /// Stops of exposure, either side of what the camera recorded.
     var exposure: Float = 0
     /// White balance in Kelvin, starting from the camera's own reading.
@@ -31,7 +31,7 @@ nonisolated struct RawDevelopSettings: Equatable, Sendable {
     }
 }
 
-nonisolated enum RawImporter {
+enum RawImporter {
     /// One context for every develop: building a CIContext allocates GPU resources, and the sheet
     /// develops again on each slider move.
     private static let context = CIContext(options: [.useSoftwareRenderer: false])

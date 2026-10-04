@@ -6,7 +6,7 @@ import Foundation
 /// Mask Information, Image Data). Original implementation of the 8BPS header,
 /// layer records, PackBits, and additional layer info. Not copied, transcribed,
 /// or adapted from GIMP, psd-tools, or any other GPL-licensed PSD reader.
-nonisolated enum PSDReader {
+enum PSDReader {
     static func matches(_ url: URL) -> Bool {
         matches(magicOf: url)
     }
@@ -405,7 +405,7 @@ nonisolated enum PSDReader {
     }
 }
 
-nonisolated private struct PSDCursor: Sendable {
+private struct PSDCursor: Sendable {
     let data: Data
     var offset = 0
 
@@ -436,14 +436,21 @@ nonisolated private struct PSDCursor: Sendable {
     mutating func u32() throws -> UInt32 {
         try need(4)
         defer { offset += 4 }
-        return UInt32(data[offset]) << 24 | UInt32(data[offset + 1]) << 16 | UInt32(data[offset + 2]) << 8 | UInt32(data[offset + 3])
+        // Assembled a byte at a time: one chain of shifts and ORs is slow enough to type-check
+        // that the compiler gives up on it.
+        var value = UInt32(data[offset]) << 24
+        value |= UInt32(data[offset + 1]) << 16
+        value |= UInt32(data[offset + 2]) << 8
+        value |= UInt32(data[offset + 3])
+        return value
     }
 
     mutating func u64() throws -> UInt64 {
         try need(8)
         defer { offset += 8 }
-        return UInt64(data[offset]) << 56 | UInt64(data[offset + 1]) << 48 | UInt64(data[offset + 2]) << 40 | UInt64(data[offset + 3]) << 32 |
-            UInt64(data[offset + 4]) << 24 | UInt64(data[offset + 5]) << 16 | UInt64(data[offset + 6]) << 8 | UInt64(data[offset + 7])
+        var value: UInt64 = 0
+        for index in 0..<8 { value = value << 8 | UInt64(data[offset + index]) }
+        return value
     }
 
     mutating func i32() throws -> Int32 { Int32(bitPattern: try u32()) }
@@ -460,7 +467,7 @@ nonisolated private struct PSDCursor: Sendable {
     }
 }
 
-nonisolated enum PSDAdjustments {
+enum PSDAdjustments {
     static func parse(_ extra: [String: Data]) -> LayerAdjustment? {
         if let data = extra["levl"] { return levels(data) }
         if let data = extra["curv"] { return curves(data) }

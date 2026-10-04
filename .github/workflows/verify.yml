@@ -77,3 +77,24 @@ jobs:
           path: '*.xcresult'
           retention-days: 7
           if-no-files-found: ignore
+
+  minimum:
+    name: minimum
+    # The oldest toolchain and macOS the project supports, for Intel: macOS 15 on Xcode 16. Newer SDK-only
+    # APIs and Swift 6.2 syntax compile out here, so this failing is the signal that one crept in.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build for Intel
+        run: >
+          xcodebuild build
+          -project Compositor.xcodeproj
+          -scheme Compositor
+          -destination 'platform=macOS,arch=x86_64'
+          -configuration Debug
+          -onlyUsePackageVersionsFromResolvedFile
+          CODE_SIGN_IDENTITY=-

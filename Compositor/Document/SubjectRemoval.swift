@@ -2,7 +2,7 @@ import AppKit
 import Vision
 import CoreImage
 
-nonisolated enum SubjectRemoval {
+enum SubjectRemoval {
     enum Failure: LocalizedError {
         case noSubject
         var errorDescription: String? { "No foreground subject was detected in this layer. Try an image with a more distinct subject." }
