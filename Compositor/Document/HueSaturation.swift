@@ -2,7 +2,7 @@ import AppKit
 import CoreImage
 
 /// The six color ranges plus Master, as in Photoshop's Cmd+U.
-enum ColorRange: String, CaseIterable, Sendable, Hashable, Codable {
+enum ColorRange: String, CaseIterable, Sendable, Hashable, Codable, LocalizedDisplayName {
     case master = "Master", reds = "Reds", yellows = "Yellows", greens = "Greens"
     case cyans = "Cyans", blues = "Blues", magentas = "Magentas"
 
@@ -145,9 +145,9 @@ enum HueSampleMode: String, CaseIterable, Sendable {
     }
     var help: String {
         switch self {
-        case .replace: "Click the image to center this range on that color"
-        case .add: "Click the image to widen this range to include that color"
-        case .remove: "Click the image to narrow this range to exclude that color"
+        case .replace: String(localized: "Click the image to center this range on that color")
+        case .add: String(localized: "Click the image to widen this range to include that color")
+        case .remove: String(localized: "Click the image to narrow this range to exclude that color")
         }
     }
 }

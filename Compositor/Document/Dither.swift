@@ -3,7 +3,7 @@ import CoreImage
 import CoreText
 
 /// Filter › Dither's looks, grouped as the panel's menu lists them. The order matches `DitherPixels.h`.
-enum DitherStyle: String, CaseIterable, Sendable {
+enum DitherStyle: String, CaseIterable, Sendable, LocalizedDisplayName {
     case atkinson = "Atkinson (Classic Mac)"
     case floydSteinberg = "Floyd–Steinberg"
     case bayer2 = "Bayer 2 × 2"
@@ -36,12 +36,12 @@ enum DitherStyle: String, CaseIterable, Sendable {
 
 /// How a chunky pixel is drawn: a solid square, or a round dot with the dark color showing around it, like the lit
 /// pixels of a dot-matrix or LED screen.
-enum DitherPixelShape: String, CaseIterable, Sendable {
+enum DitherPixelShape: String, CaseIterable, Sendable, LocalizedDisplayName {
     case square = "Square"
     case dot = "Dot"
 }
 
-enum DitherColors: String, CaseIterable, Sendable {
+enum DitherColors: String, CaseIterable, Sendable, LocalizedDisplayName {
     case blackWhite = "Black & White"
     case twoColors = "Two Colors"
     case original = "Original"

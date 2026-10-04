@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-enum LayerSampling: String, CaseIterable, Codable, Sendable {
+enum LayerSampling: String, CaseIterable, Codable, Sendable, LocalizedDisplayName {
     case nearest = "Nearest"
     case smooth = "Smooth"
     case high = "High quality"

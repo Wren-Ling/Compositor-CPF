@@ -4,7 +4,7 @@ import Observation
 
 /// Filters from the Filter menu. Each runs on the active image layer, inside the selection if
 /// there is one, with a live preview and one undo step on OK.
-enum FilterKind: String, CaseIterable, Sendable {
+enum FilterKind: String, CaseIterable, Sendable, LocalizedDisplayName {
     case gaussianBlur = "Gaussian Blur"
     case motionBlur = "Motion Blur"
     case addNoise = "Add Noise"
@@ -32,7 +32,7 @@ enum FilterKind: String, CaseIterable, Sendable {
 
 /// Remove Background's two ways of working: Apple's own subject mask on its own, or that mask refined against the
 /// layer's detail, which recovers hair and fur but takes longer.
-enum BackgroundQuality: String, CaseIterable, Sendable {
+enum BackgroundQuality: String, CaseIterable, Sendable, LocalizedDisplayName {
     case basic = "Basic"
     case advanced = "Advanced"
 }

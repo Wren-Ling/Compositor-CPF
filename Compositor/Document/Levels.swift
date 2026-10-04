@@ -1,7 +1,7 @@
 import AppKit
 import Observation
 
-enum LevelsChannel: String, CaseIterable, Sendable, Codable {
+enum LevelsChannel: String, CaseIterable, Sendable, Codable, LocalizedDisplayName {
     case rgb = "RGB", red = "Red", green = "Green", blue = "Blue"
     var index: Int { Self.allCases.firstIndex(of: self)! }
 }

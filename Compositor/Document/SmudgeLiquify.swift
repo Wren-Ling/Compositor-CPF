@@ -2,12 +2,12 @@ import AppKit
 
 /// The Blur tool's modes. Smudge and Liquify push the active layer's pixels around under the brush.
 /// The Brush tool's modes.
-enum BrushToolMode: String, CaseIterable, Sendable {
+enum BrushToolMode: String, CaseIterable, Sendable, LocalizedDisplayName {
     case paint = "Paint"
     case erase = "Erase"
 }
 
-enum BlurToolMode: String, CaseIterable, Sendable {
+enum BlurToolMode: String, CaseIterable, Sendable, LocalizedDisplayName {
     case liquify = "Liquify"
     case blur = "Blur"
     case smudge = "Smudge"
@@ -200,7 +200,7 @@ final class WarpStroke {
 extension EditorSession {
     func beginWarp(at point: CGPoint) {
         guard canPaint, !isMaskSelected, let layer = activeLayer, let image = layer.asset?.image, let document else {
-            brushError = isMaskSelected ? "Smudge and Liquify work on a layer's pixels, not its mask." : paintRefusal
+            brushError = isMaskSelected ? String(localized: "Smudge and Liquify work on a layer's pixels, not its mask.") : paintRefusal
             return
         }
         finishOpacityEdit()
