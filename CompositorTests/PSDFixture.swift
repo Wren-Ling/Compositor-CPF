@@ -3,7 +3,7 @@ import Foundation
 @testable import Compositor
 
 /// Builds tiny Photoshop files for reader tests. Not part of the app; Compositor does not write PSD.
-nonisolated enum PSDFixture {
+enum PSDFixture {
     static func data(_ document: PSDDocument, composite: CGImage, largeDocument: Bool = false,
                      extras: [UUID: [String: Data]] = [:]) throws -> Data {
         try data(document, composite: composite, largeDocument: largeDocument, additionalLayerInfo: nil, extras: extras)
@@ -516,7 +516,7 @@ nonisolated enum PSDFixture {
     }
 }
 
-nonisolated private struct PSDBuffer: Sendable {
+private struct PSDBuffer: Sendable {
     var data = Data()
     mutating func u8(_ value: UInt8) { data.append(value) }
     mutating func u16(_ value: UInt16) { data.appendUInt16(value) }

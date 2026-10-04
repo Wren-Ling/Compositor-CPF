@@ -4,7 +4,7 @@ import CoreImage
 import ImageIO
 import UniformTypeIdentifiers
 
-nonisolated struct ImportedImage: @unchecked Sendable {
+struct ImportedImage: @unchecked Sendable {
     // Immutable CGImages can be shared with the main-thread renderer.
     let image: CGImage
     let thumbnail: CGImage
@@ -12,7 +12,7 @@ nonisolated struct ImportedImage: @unchecked Sendable {
     var raster: RasterSnapshot? = nil
 }
 
-nonisolated enum ImageImportError: LocalizedError {
+enum ImageImportError: LocalizedError {
     case unreadable, unsupported, tooLarge
     var errorDescription: String? {
         switch self {

@@ -4,7 +4,7 @@ import Observation
 
 /// Filters from the Filter menu. Each runs on the active image layer, inside the selection if
 /// there is one, with a live preview and one undo step on OK.
-nonisolated enum FilterKind: String, CaseIterable, Sendable {
+enum FilterKind: String, CaseIterable, Sendable {
     case gaussianBlur = "Gaussian Blur"
     case motionBlur = "Motion Blur"
     case addNoise = "Add Noise"
@@ -32,13 +32,13 @@ nonisolated enum FilterKind: String, CaseIterable, Sendable {
 
 /// Remove Background's two ways of working: Apple's own subject mask on its own, or that mask refined against the
 /// layer's detail, which recovers hair and fur but takes longer.
-nonisolated enum BackgroundQuality: String, CaseIterable, Sendable {
+enum BackgroundQuality: String, CaseIterable, Sendable {
     case basic = "Basic"
     case advanced = "Advanced"
 }
 
 /// Every filter's settings; each filter reads only its own.
-nonisolated struct FilterSettings: Equatable, Sendable {
+struct FilterSettings: Equatable, Sendable {
     /// Gaussian Blur radius in layer pixels (the blur's standard deviation), 0.1–250.
     var radius: Double = 1
     /// Motion Blur direction in degrees, counterclockwise from horizontal as in Photoshop, −90–90.
@@ -121,7 +121,7 @@ nonisolated struct FilterSettings: Equatable, Sendable {
     }
 }
 
-nonisolated struct FilterJob: @unchecked Sendable {
+struct FilterJob: @unchecked Sendable {
     let kind: FilterKind
     let image: CGImage
     let settings: FilterSettings
@@ -147,7 +147,7 @@ nonisolated struct FilterJob: @unchecked Sendable {
     var showsSharpenMask = false
 }
 
-nonisolated enum PixelFilter {
+enum PixelFilter {
     /// `image` cropped to the pixels that are actually there, with the transform that keeps them in place: a blur
     /// is given generous room to spread, and whatever it leaves empty is cut away again.
     static func trimmed(_ image: CGImage, placed: LayerTransform) throws -> (image: CGImage, transform: LayerTransform) {

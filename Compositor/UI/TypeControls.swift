@@ -114,7 +114,10 @@ private struct TypeFontPicker: NSViewRepresentable {
     func makeNSView(context: Context) -> NSPopUpButton {
         let button = FixedWidthPopUpButton(frame: .zero, pullsDown: false)
         if !fontName.isEmpty { button.addItem(withTitle: fontName) }
-        button.borderShape = .capsule
+        // `borderShape` is macOS 26-only, so a 26 SDK applies it and an older one keeps the standard bezel.
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) { button.borderShape = .capsule }
+        #endif
         // A long font name is cut off at its end rather than widening the control or scrolling its start away.
         button.cell?.lineBreakMode = .byTruncatingTail
         button.cell?.usesSingleLineMode = true

@@ -53,7 +53,9 @@ struct ResizeSnapTests {
         let (session, layer) = try session()
         let index = try #require(session.document?.layers.firstIndex { $0.id == layer })
         session.document?.layers[index].transform.rotation = 20
-        let original = try #require(session.document?.layers[index].transform)
+        // Split in two: the 6.0 `#require` macro can't expand an optional chain followed by a subscript.
+        let changed = try #require(session.document?.layers[index])
+        let original = changed.transform
         let drag = TransformDrag(original: original, start: CGPoint(x: 110, y: 60), mode: .resize(3))
         let point = CGPoint(x: 147, y: 60)
         #expect(session.snappedResizePoint(point, drag: drag, proportional: false, moving: [layer], tolerance: 5) {

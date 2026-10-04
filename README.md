@@ -79,8 +79,8 @@ brew install --cask robbietilton-compositor
 
 ## Requirements
 
-- macOS 26.0 or later on a Mac with Apple silicon
-- Xcode 26 or later (to build from source)
+- macOS 15.0 or later, on Apple silicon or Intel
+- Xcode 16 or later (to build from source)
 
 ## Building
 

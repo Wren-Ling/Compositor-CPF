@@ -4,7 +4,7 @@ import AppKit
 /// A single worker, superseded-request cancellation and a fixed pixel budget keep slider drags off the UI thread.
 @MainActor
 final class EffectsPreviewCache {
-    nonisolated private final class Request: @unchecked Sendable {
+    private final class Request: @unchecked Sendable {
         let id = UUID()
         let image: CGImage
         let mask: CGImage?
@@ -32,7 +32,7 @@ final class EffectsPreviewCache {
                 && effects == other.effects && sideLimit == other.sideLimit
         }
     }
-    nonisolated private struct Result: @unchecked Sendable {
+    private struct Result: @unchecked Sendable {
         let image: CGImage
         let inset: CGFloat
         /// Set only on a seeded result: where that image belongs on the document, which an inset can't express

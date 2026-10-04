@@ -2,7 +2,7 @@ import AppKit
 import CoreImage
 
 /// The six color ranges plus Master, as in Photoshop's Cmd+U.
-nonisolated enum ColorRange: String, CaseIterable, Sendable, Hashable, Codable {
+enum ColorRange: String, CaseIterable, Sendable, Hashable, Codable {
     case master = "Master", reds = "Reds", yellows = "Yellows", greens = "Greens"
     case cyans = "Cyans", blues = "Blues", magentas = "Magentas"
 
@@ -23,7 +23,7 @@ nonisolated enum ColorRange: String, CaseIterable, Sendable, Hashable, Codable {
 
 /// A hue band in degrees, wrapping at 360: full strength between `rangeStart` and
 /// `rangeEnd`, fading to nothing at `falloffStart` and `falloffEnd`.
-nonisolated struct HueBand: Equatable, Sendable, Codable {
+struct HueBand: Equatable, Sendable, Codable {
     var falloffStart: Double
     var rangeStart: Double
     var rangeEnd: Double
@@ -132,7 +132,7 @@ nonisolated struct HueBand: Equatable, Sendable, Codable {
 }
 
 /// Which eyedropper is armed while the Hue/Saturation panel is open.
-nonisolated enum HueSampleMode: String, CaseIterable, Sendable {
+enum HueSampleMode: String, CaseIterable, Sendable {
     case replace = "Sample", add = "Add", remove = "Remove"
     /// All three are eyedroppers; Add and Remove carry a small badge.
     var symbol: String { "eyedropper" }
@@ -159,7 +159,7 @@ struct HueTargetDrag {
     let saturation: Double
 }
 
-nonisolated struct RangeAdjustment: Equatable, Sendable, Codable {
+struct RangeAdjustment: Equatable, Sendable, Codable {
     var hue: Double = 0
     var saturation: Double = 0
     var lightness: Double = 0
@@ -167,7 +167,7 @@ nonisolated struct RangeAdjustment: Equatable, Sendable, Codable {
 
 /// Hue is −180…180 (0…360 when colorizing), Saturation −100…100 (0…100 colorizing),
 /// Lightness −100…100. Each color range keeps its own values; Master applies everywhere.
-nonisolated struct HueSaturationSettings: Equatable, Sendable, Codable {
+struct HueSaturationSettings: Equatable, Sendable, Codable {
     /// Which range the sliders and spectrum edit.
     var range: ColorRange = .master
     var colorize = false
@@ -213,7 +213,7 @@ nonisolated struct HueSaturationSettings: Equatable, Sendable, Codable {
     }
 }
 
-nonisolated struct HueSaturationJob: @unchecked Sendable {
+struct HueSaturationJob: @unchecked Sendable {
     let image: CGImage
     let settings: HueSaturationSettings
     let selection: SelectionClip?
@@ -222,14 +222,14 @@ nonisolated struct HueSaturationJob: @unchecked Sendable {
     var thumbnail = true
 }
 
-nonisolated struct AdjustedPixels: @unchecked Sendable {
+struct AdjustedPixels: @unchecked Sendable {
     let image: CGImage
     let thumbnail: CGImage?
 }
 
 /// Builds a color cube from the settings and applies it on the GPU. Working through a cube
 /// keeps slider dragging fast on large images; identity settings never reach here.
-nonisolated enum HueSaturationFilter {
+enum HueSaturationFilter {
     /// 33 points per axis, the usual size for this kind of lookup: fast to build, smooth enough.
     static let dimension = 33
 

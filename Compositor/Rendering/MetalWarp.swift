@@ -80,7 +80,8 @@ import Metal
         }
         guard let encoder else { return }
         var dab = dab
-        // Each dab works on what the one before it left.
+        // Each dab works on what the one before it left. Smudge's two passes also hand a buffer between them, and a
+        // barrier covers only the scopes it names, so both are declared.
         encoder.memoryBarrier(scope: .textures)
         encoder.setComputePipelineState(pipeline)
         for (index, texture) in textures.enumerated() { encoder.setTexture(texture, index: index) }
