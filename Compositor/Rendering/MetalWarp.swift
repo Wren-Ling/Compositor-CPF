@@ -12,6 +12,14 @@ import Metal
     private let renderer: GPUCanvasRenderer
     /// Smudge: the color the brush carries, a (2r+1)² square, in 0…255.
     private var carried: MTLTexture?
+    /// Smudge: what a dab samples — the canvas where it paints and the brush's carried color — gathered for the
+    /// threads to work from, and what they lay back down. A dab touches each texture only where its own thread owns
+    /// it, so no thread depends on another's read; taking the reads through here keeps every texture access on one
+    /// side of read or write, which is what Intel's integrated GPUs need (see `source`).
+    private var dabSamples: MTLBuffer?
+    /// Floats a smudged pixel takes in `dabSamples`: the color it paints over, the color the brush carries, and the
+    /// weight the dab paints with.
+    static let smudgeStride = 9
     /// Liquify: the layer as the stroke found it, and how far each pixel has moved from it — a source offset per
     /// pixel, in pixels. Each dab moves the offsets, never the pixels, and a pixel is drawn afresh from the untouched
     /// ones through its offset; resampled at every dab instead, as the pixels themselves were, they softened a little
@@ -29,7 +37,7 @@ import Metal
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: pixels.width,
                                                                   height: pixels.height, mipmapped: false)
         descriptor.usage = [.shaderRead, .shaderWrite]
-        descriptor.storageMode = .shared
+        descriptor.storageMode = renderer.device.textureStorageMode
         guard let texture = renderer.device.makeTexture(descriptor: descriptor) else { return nil }
         // Top-left rows, as the document's: a point's row is its y.
         texture.replace(region: MTLRegionMake2D(0, 0, pixels.width, pixels.height), mipmapLevel: 0,
@@ -45,6 +53,15 @@ import Metal
 
     /// The working copy's pixels, back in `pixels` (the same size), once every dab has run.
     func read(into pixels: CGContext) {
+        // A managed texture's CPU copy is brought up to date with what the dabs wrote on the GPU.
+        if texture.storageMode == .managed {
+            encoder?.endEncoding()
+            encoder = nil
+            if buffer == nil { buffer = renderer.queue.makeCommandBuffer() }
+            let blit = buffer?.makeBlitCommandEncoder()
+            blit?.synchronize(resource: texture)
+            blit?.endEncoding()
+        }
         commit()
         last?.waitUntilCompleted()
         guard let data = pixels.data else { return }
@@ -72,7 +89,7 @@ import Metal
         return renderer.device.makeTexture(descriptor: descriptor)
     }
 
-    private func dispatch(_ name: String, _ dab: Dab, textures: [MTLTexture], threads: Int) {
+    private func dispatch(_ name: String, _ dab: Dab, textures: [MTLTexture], buffers: [MTLBuffer] = [], threads: Int) {
         guard let pipeline = Self.pipelines?[name] else { return }
         if encoder == nil {
             buffer = renderer.queue.makeCommandBuffer()
@@ -80,10 +97,14 @@ import Metal
         }
         guard let encoder else { return }
         var dab = dab
-        // Each dab works on what the one before it left.
+        // Each dab works on what the one before it left. Smudge's two passes also hand a buffer between them, and a
+        // barrier covers only the scopes it names, so both are declared.
         encoder.memoryBarrier(scope: .textures)
+        encoder.memoryBarrier(scope: .buffers)
         encoder.setComputePipelineState(pipeline)
         for (index, texture) in textures.enumerated() { encoder.setTexture(texture, index: index) }
+        // The dab is buffer 0, the kernels' own after it.
+        for (index, buffer) in buffers.enumerated() { encoder.setBuffer(buffer, offset: 0, index: index + 1) }
         encoder.setBytes(&dab, length: MemoryLayout<Dab>.stride, index: 0)
         let group = MTLSize(width: 16, height: 16, depth: 1)
         encoder.dispatchThreadgroups(MTLSize(width: (threads + 15) / 16, height: (threads + 15) / 16, depth: 1),
@@ -111,10 +132,19 @@ import Metal
 
     func smudge(at center: CGPoint, radius: Int, diameter: CGFloat, hardness: CGFloat, strength: CGFloat) {
         guard let carried else { return }
-        dispatch("warp_smudge", Dab(center: SIMD2(Int32(center.x.rounded()), Int32(center.y.rounded())), radius: Int32(radius),
-                                    size: SIMD2(Int32(width), Int32(height)), origin: .zero, area: .zero,
-                                    inverseRadius: 1 / Float(diameter / 2), hardness: Float(hardness), keep: Float(strength), move: .zero),
-                 textures: [texture, carried], threads: 2 * radius + 1)
+        let side = 2 * radius + 1
+        let length = side * side * Self.smudgeStride * MemoryLayout<Float>.stride
+        if dabSamples?.length != length {
+            dabSamples = renderer.device.makeBuffer(length: length, options: .storageModePrivate)
+        }
+        guard let dabSamples else { return }
+        let dab = Dab(center: SIMD2(Int32(center.x.rounded()), Int32(center.y.rounded())), radius: Int32(radius),
+                      size: SIMD2(Int32(width), Int32(height)), origin: .zero, area: .zero,
+                      inverseRadius: 1 / Float(diameter / 2), hardness: Float(hardness), keep: Float(strength), move: .zero)
+        // What the dab paints over and what the brush carries, gathered first: one pass can't read and write the same
+        // texture on a tier 1 GPU (see `source`).
+        dispatch("warp_smudge_gather", dab, textures: [texture, carried], buffers: [dabSamples], threads: side)
+        dispatch("warp_smudge_apply", dab, textures: [texture, carried], buffers: [dabSamples], threads: side)
     }
 
     /// Forward warp, as `WarpStroke.push`: what's under the brush moves with it, most at its center, fading to none at its
@@ -158,7 +188,7 @@ import Metal
         guard let device = MTLCreateSystemDefaultDevice(), let library = try? device.makeLibrary(source: source, options: nil)
         else { return nil }
         var result: [String: MTLComputePipelineState] = [:]
-        for name in ["warp_pick_up", "warp_smudge", "warp_copy", "warp_clear", "warp_push"] {
+        for name in ["warp_pick_up", "warp_smudge_gather", "warp_smudge_apply", "warp_copy", "warp_clear", "warp_push"] {
             guard let function = library.makeFunction(name: name),
                   let pipeline = try? device.makeComputePipelineState(function: function) else { return nil }
             result[name] = pipeline
@@ -193,16 +223,43 @@ import Metal
         carried.write(inside ? canvas.read(uint2(p)) * 255.0f : float4(0.0f), gid);
     }
 
-    kernel void warp_smudge(texture2d<float, access::read_write> canvas [[texture(0)]],
-                            texture2d<float, access::read_write> carried [[texture(1)]],
-                            constant Dab &d [[buffer(0)]], uint2 gid [[thread_position_in_grid]]) {
+    // A smudge dab: what it paints over and what the brush carries are read first, then written back, by the two
+    // passes below. One pass reading and writing a texture in a single dispatch is a read-write texture access, which
+    // only tier 2 GPUs do correctly — Intel's integrated ones are tier 1, and there the write lands on garbage (the
+    // texture reads back as 255,0,0,0). Reading through a buffer instead costs a copy and works everywhere.
+    // Layout: four floats a pixel, then the carried color, then the weight the dab paints it with.
+    constant int kSmudgeStride = 9;
+
+    kernel void warp_smudge_gather(texture2d<float, access::read> canvas [[texture(0)]],
+                                   texture2d<float, access::read> carried [[texture(1)]],
+                                   device float *samples [[buffer(1)]],
+                                   constant Dab &d [[buffer(0)]], uint2 gid [[thread_position_in_grid]]) {
         int side = 2 * d.radius + 1;
         if (int(gid.x) >= side || int(gid.y) >= side) return;
         int2 offset = int2(gid) - d.radius, p = d.center + offset;
-        if (p.x < 0 || p.y < 0 || p.x >= d.size.x || p.y >= d.size.y) return;
+        int base = (int(gid.y) * side + int(gid.x)) * kSmudgeStride;
+        bool inside = p.x >= 0 && p.y >= 0 && p.x < d.size.x && p.y < d.size.y;
         float w = weight(sqrt(float(offset.x * offset.x + offset.y * offset.y)) * d.inverseRadius, d.hardness);
+        samples[base + 8] = inside ? w : 0.0f;
+        if (!inside || w <= 0.0f) return;
+        float4 under = canvas.read(uint2(p)) * 255.0f;
+        for (int k = 0; k < 4; ++k) samples[base + k] = under[k];
+        float4 held = carried.read(gid);
+        for (int k = 0; k < 4; ++k) samples[base + 4 + k] = held[k];
+    }
+
+    kernel void warp_smudge_apply(texture2d<float, access::write> canvas [[texture(0)]],
+                                  texture2d<float, access::write> carried [[texture(1)]],
+                                  device float *samples [[buffer(1)]],
+                                  constant Dab &d [[buffer(0)]], uint2 gid [[thread_position_in_grid]]) {
+        int side = 2 * d.radius + 1;
+        if (int(gid.x) >= side || int(gid.y) >= side) return;
+        float w = samples[(int(gid.y) * side + int(gid.x)) * kSmudgeStride + 8];
         if (w <= 0.0f) return;
-        float4 under = canvas.read(uint2(p)) * 255.0f, held = carried.read(gid);
+        int2 p = d.center + int2(gid) - d.radius;
+        int base = (int(gid.y) * side + int(gid.x)) * kSmudgeStride;
+        float4 under = float4(samples[base], samples[base + 1], samples[base + 2], samples[base + 3]);
+        float4 held = float4(samples[base + 4], samples[base + 5], samples[base + 6], samples[base + 7]);
         // What was under the brush at the last dab, laid down here at the smudge's strength; the brush then carries
         // what it just left, and nothing older (see WarpStroke.smudge).
         float4 painted = under + (held - under) * w * d.keep;

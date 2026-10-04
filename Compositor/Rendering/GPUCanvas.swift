@@ -10,6 +10,12 @@ import QuartzCore
 /// Everything is laid out in pixel coordinates with y pointing down, as the pixels sit in a texture: an image's top
 /// row is its row 0, and the frame's row 0 is the top of the view. Blending happens in sRGB, not linear light, as it
 /// does on the canvas and in Photoshop.
+extension MTLDevice {
+    /// Shared on Apple silicon. An Intel Mac's GPU can't share a texture's memory with the CPU, so there its
+    /// textures are managed instead: a CPU copy and a GPU copy, synchronized before the CPU reads one back.
+    var textureStorageMode: MTLStorageMode { hasUnifiedMemory ? .shared : .managed }
+}
+
 @MainActor final class GPUCanvasRenderer {
     static let shared: GPUCanvasRenderer? = GPUCanvasRenderer()
 
@@ -189,7 +195,7 @@ import QuartzCore
             else { return false }
             let w = Int(bounds.width), h = Int(bounds.height)
             let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: texture.pixelFormat, width: w, height: h, mipmapped: false)
-            descriptor.storageMode = .shared
+            descriptor.storageMode = renderer.device.textureStorageMode
             guard let staging = renderer.device.makeTexture(descriptor: descriptor) else { return false }
             let bytes = mask ? 1 : 4
             let offset = Int(bounds.minY - rect.minY.rounded()) * pixels.bytesPerRow + Int(bounds.minX - rect.minX.rounded()) * bytes
@@ -246,7 +252,7 @@ import QuartzCore
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: mask ? .r8Unorm : .rgba8Unorm,
                                                                   width: width, height: height, mipmapped: false)
         descriptor.usage = [.shaderRead, .shaderWrite]
-        descriptor.storageMode = .shared
+        descriptor.storageMode = device.textureStorageMode
         return device.makeTexture(descriptor: descriptor)
     }
 
